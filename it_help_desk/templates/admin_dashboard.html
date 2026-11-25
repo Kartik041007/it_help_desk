@@ -1,0 +1,2271 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | IT Help Desk</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --navy-deep: #071427;
+            --navy: #0d1f38;
+            --panel: #0f2440;
+            --panel-alt: #0a192f;
+            --line: rgba(120, 190, 255, 0.14);
+            --line-strong: rgba(120, 190, 255, 0.28);
+            --teal: #2dd4bf;
+            --teal-glow: rgba(45, 212, 191, 0.35);
+            --amber: #ffb454;
+            --amber-glow: rgba(255, 180, 84, 0.35);
+            --blue: #60a5fa;
+            --blue-glow: rgba(96, 165, 250, 0.35);
+            --rose: #f43f5e;
+            --rose-glow: rgba(244, 63, 94, 0.35);
+            --purple: #c084fc;
+            --purple-glow: rgba(192, 132, 252, 0.35);
+            --text-main: #eef3fb;
+            --text-dim: #93a4c3;
+            --text-muted: #5e7394;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            min-height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: var(--navy-deep);
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-main);
+            position: relative;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Background grid & radiant ambient glow */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line) 1px, transparent 1px);
+            background-size: 46px 46px;
+            mask-image: radial-gradient(circle at 50% 0%, black 0%, transparent 75%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: -15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1200px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.12) 0%, rgba(96, 165, 250, 0.08) 35%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* Top Navigation */
+        .navbar {
+            background: rgba(7, 20, 39, 0.88);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--line);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            color: var(--text-main);
+            font-size: 18px;
+            text-decoration: none;
+        }
+
+        .brand-badge {
+            width: 34px;
+            height: 34px;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--teal), #0d9488);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 16px var(--teal-glow);
+            color: #04231f;
+        }
+
+        .admin-badge {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            color: #fda4af;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-ghost {
+            background: rgba(15, 36, 64, 0.6);
+            border: 1px solid var(--line);
+            color: var(--text-main);
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-ghost:hover {
+            background: rgba(15, 36, 64, 1);
+            border-color: var(--teal);
+            color: var(--teal);
+        }
+
+        .btn-logout {
+            background: rgba(244, 63, 94, 0.1);
+            border: 1px solid rgba(244, 63, 94, 0.25);
+            color: #fda4af;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-logout:hover {
+            background: rgba(244, 63, 94, 0.22);
+            color: #ffffff;
+            border-color: #f43f5e;
+        }
+
+        /* Container Wrap */
+        .admin-wrap {
+            max-width: 1340px;
+            margin: 0 auto;
+            padding: 28px 24px;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Header Greeting */
+        .dash-header {
+            margin-bottom: 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .dash-header .eyebrow {
+            font-size: 11.5px;
+            letter-spacing: 0.12em;
+            color: var(--teal);
+            text-transform: uppercase;
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .dash-header h1 {
+            font-size: 28px;
+            font-weight: 700;
+            margin: 0;
+            background: linear-gradient(90deg, #ffffff, #a5f3fc);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .dash-header p {
+            color: var(--text-dim);
+            font-size: 14.5px;
+            margin: 4px 0 0 0;
+        }
+
+        /* KPI Stat Cards Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1100px) {
+            .stats-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 700px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 20px 18px;
+            cursor: pointer;
+            transition: all 0.22s ease;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .stat-card::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: transparent;
+            transition: background 0.2s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--line-strong);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.35);
+        }
+
+        .stat-card.active-filter {
+            border-color: var(--teal);
+            box-shadow: 0 0 20px rgba(45, 212, 191, 0.25);
+        }
+
+        .stat-card.card-total::after {
+            background: linear-gradient(90deg, var(--teal), var(--blue));
+        }
+
+        .stat-card.card-open::after {
+            background: var(--amber);
+        }
+
+        .stat-card.card-progress::after {
+            background: var(--blue);
+        }
+
+        .stat-card.card-resolved::after {
+            background: var(--teal);
+        }
+
+        .stat-card.card-unassigned::after {
+            background: var(--rose);
+        }
+
+        .stat-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .stat-label {
+            font-size: 11.5px;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 600;
+        }
+
+        .stat-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-total {
+            background: rgba(147, 164, 195, 0.12);
+            color: var(--text-main);
+        }
+
+        .icon-open {
+            background: rgba(255, 180, 84, 0.15);
+            color: var(--amber);
+        }
+
+        .icon-progress {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue);
+        }
+
+        .icon-resolved {
+            background: rgba(45, 212, 191, 0.15);
+            color: var(--teal);
+        }
+
+        .icon-unassigned {
+            background: rgba(244, 63, 94, 0.15);
+            color: var(--rose);
+        }
+
+        .stat-value {
+            font-size: 30px;
+            font-weight: 700;
+            line-height: 1;
+            margin-bottom: 6px;
+        }
+
+        .stat-card.card-total .stat-value {
+            color: #ffffff;
+        }
+
+        .stat-card.card-open .stat-value {
+            color: var(--amber);
+        }
+
+        .stat-card.card-progress .stat-value {
+            color: var(--blue);
+        }
+
+        .stat-card.card-resolved .stat-value {
+            color: var(--teal);
+        }
+
+        .stat-card.card-unassigned .stat-value {
+            color: var(--rose);
+        }
+
+        .stat-desc {
+            font-size: 11.5px;
+            color: var(--text-dim);
+            margin: 0;
+        }
+
+        /* Filter & Controls Toolbar */
+        .toolbar-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .toolbar-top {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 14px;
+        }
+
+        .status-tabs {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: rgba(7, 20, 39, 0.6);
+            border: 1px solid var(--line);
+            color: var(--text-dim);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.18s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-main);
+            border-color: var(--line-strong);
+            background: rgba(15, 36, 64, 0.8);
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.2), rgba(13, 148, 136, 0.3));
+            border-color: var(--teal);
+            color: #5eead4;
+            box-shadow: 0 0 12px rgba(45, 212, 191, 0.2);
+        }
+
+        .tab-badge {
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 6px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .tab-btn.active .tab-badge {
+            background: rgba(45, 212, 191, 0.3);
+            color: #ffffff;
+        }
+
+        .toolbar-controls {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-box {
+            position: relative;
+            min-width: 260px;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: var(--navy-deep);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 8px 14px 8px 36px;
+            color: var(--text-main);
+            font-size: 13.5px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .search-box input:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 12px rgba(45, 212, 191, 0.25);
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .filter-select {
+            background: var(--navy-deep);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 8px 14px;
+            color: var(--text-main);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+        }
+
+        .filter-select:focus {
+            border-color: var(--teal);
+        }
+
+        /* Tickets Table & Container */
+        .table-panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.3);
+        }
+
+        .tickets-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        .tickets-table th {
+            background: rgba(10, 25, 47, 0.95);
+            padding: 14px 18px;
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            font-weight: 600;
+            border-bottom: 1px solid var(--line);
+            white-space: nowrap;
+        }
+
+        .tickets-table td {
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+            vertical-align: middle;
+            font-size: 13.5px;
+        }
+
+        .tickets-table tr {
+            transition: background 0.15s ease;
+        }
+
+        .tickets-table tr:hover {
+            background: rgba(13, 31, 56, 0.6);
+        }
+
+        .tickets-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Monospace Ticket ID */
+        .ticket-num {
+            color: var(--teal);
+            font-weight: 600;
+            font-size: 12.5px;
+            letter-spacing: 0.04em;
+        }
+
+        /* Title & details */
+        .ticket-title-link {
+            color: var(--text-main);
+            font-weight: 600;
+            text-decoration: none;
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14.5px;
+            transition: color 0.15s ease;
+            cursor: pointer;
+        }
+
+        .ticket-title-link:hover {
+            color: var(--teal);
+        }
+
+        .ticket-desc-snippet {
+            color: var(--text-dim);
+            font-size: 12px;
+            margin: 0;
+            max-width: 320px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Category pill */
+        .cat-badge {
+            background: rgba(96, 165, 250, 0.1);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+            color: #93c5fd;
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 500;
+            display: inline-block;
+        }
+
+        /* Submitter info */
+        .user-info-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar-initial {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .user-email {
+            font-size: 11.5px;
+            color: var(--text-dim);
+        }
+
+        /* Status glowing pills */
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .status-pill-open {
+            color: var(--amber);
+            background: rgba(255, 180, 84, 0.12);
+            border: 1px solid rgba(255, 180, 84, 0.3);
+        }
+
+        .status-pill-progress {
+            color: var(--blue);
+            background: rgba(96, 165, 250, 0.12);
+            border: 1px solid rgba(96, 165, 250, 0.3);
+        }
+
+        .status-pill-resolved {
+            color: var(--teal);
+            background: rgba(45, 212, 191, 0.12);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+        }
+
+        .status-pill-closed {
+            color: var(--text-dim);
+            background: rgba(148, 163, 184, 0.1);
+            border: 1px solid rgba(148, 163, 184, 0.25);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .status-pill-open .status-dot {
+            background: var(--amber);
+            box-shadow: 0 0 6px var(--amber);
+        }
+
+        .status-pill-progress .status-dot {
+            background: var(--blue);
+            box-shadow: 0 0 6px var(--blue);
+        }
+
+        .status-pill-resolved .status-dot {
+            background: var(--teal);
+            box-shadow: 0 0 6px var(--teal);
+        }
+
+        .status-pill-closed .status-dot {
+            background: var(--text-dim);
+        }
+
+        /* Assigned Agent Cell */
+        .agent-assigned-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .agent-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #0d9488, var(--teal));
+            color: #04231f;
+            font-weight: 700;
+            font-size: 11.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+        }
+
+        .agent-name {
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text-main);
+        }
+
+        .role-tag {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 1px 5px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .role-tag.staff {
+            background: rgba(45, 212, 191, 0.18);
+            color: var(--teal);
+            border: 1px solid rgba(45, 212, 191, 0.3);
+        }
+
+        .role-tag.admin {
+            background: rgba(244, 63, 94, 0.18);
+            color: #fda4af;
+            border: 1px solid rgba(244, 63, 94, 0.3);
+        }
+
+        .unassigned-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 6px;
+            background: rgba(244, 63, 94, 0.12);
+            border: 1px dashed rgba(244, 63, 94, 0.4);
+            color: #f87171;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+
+        /* Action Buttons */
+        .action-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-assign {
+            background: linear-gradient(135deg, rgba(45, 212, 191, 0.15), rgba(13, 148, 136, 0.25));
+            border: 1px solid rgba(45, 212, 191, 0.35);
+            color: var(--teal);
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .btn-assign:hover {
+            background: linear-gradient(135deg, var(--teal), #0d9488);
+            color: #04231f;
+            box-shadow: 0 0 14px var(--teal-glow);
+            transform: translateY(-1px);
+        }
+
+        .btn-details {
+            background: rgba(147, 164, 195, 0.1);
+            border: 1px solid var(--line);
+            color: var(--text-dim);
+            padding: 6px 10px;
+            border-radius: 8px;
+            font-size: 12.5px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-details:hover {
+            color: var(--text-main);
+            border-color: var(--line-strong);
+            background: rgba(147, 164, 195, 0.2);
+        }
+
+        /* Status Quick Dropdown */
+        .status-quick-select {
+            background: var(--navy-deep);
+            border: 1px solid var(--line);
+            color: var(--text-main);
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 11.5px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .status-quick-select:hover {
+            border-color: var(--line-strong);
+        }
+
+        /* Empty state */
+        .empty-row td {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+
+        /* Modern Dark Modal Styling */
+        .modal-content {
+            background: #0b1c33;
+            border: 1px solid var(--line-strong);
+            border-radius: 16px;
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+            color: var(--text-main);
+        }
+
+        .modal-header {
+            border-bottom: 1px solid var(--line);
+            padding: 20px 24px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-footer {
+            border-top: 1px solid var(--line);
+            padding: 18px 24px;
+        }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 20px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .btn-close-modal:hover {
+            color: #ffffff;
+        }
+
+        .form-label {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            margin-bottom: 6px;
+        }
+
+        .modal-select,
+        .modal-textarea,
+        .modal-input {
+            width: 100%;
+            background: var(--navy-deep);
+            border: 1px solid var(--line);
+            border-radius: 9px;
+            padding: 10px 14px;
+            color: var(--text-main);
+            font-size: 14px;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .modal-select:focus,
+        .modal-textarea:focus,
+        .modal-input:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 12px rgba(45, 212, 191, 0.25);
+        }
+
+        .ticket-modal-preview {
+            background: rgba(7, 20, 39, 0.7);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+        }
+
+        .preview-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .preview-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-main);
+            margin: 0;
+        }
+
+        .preview-desc {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin: 6px 0 0 0;
+            line-height: 1.45;
+        }
+
+        /* Timeline in Details Modal */
+        .timeline-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            position: relative;
+        }
+
+        .timeline-list::before {
+            content: "";
+            position: absolute;
+            left: 12px;
+            top: 6px;
+            bottom: 6px;
+            width: 2px;
+            background: var(--line);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 34px;
+            margin-bottom: 16px;
+        }
+
+        .timeline-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--teal);
+            position: absolute;
+            left: 8px;
+            top: 5px;
+            box-shadow: 0 0 8px var(--teal);
+        }
+
+        .timeline-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        .timeline-time {
+            font-size: 11.5px;
+            color: var(--text-dim);
+        }
+
+        /* Toast Container */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 1050;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .custom-toast {
+            background: #0f2440;
+            border: 1px solid var(--teal);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 16px rgba(45, 212, 191, 0.25);
+            border-radius: 10px;
+            padding: 12px 18px;
+            color: #ffffff;
+            font-size: 13.5px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            animation: riseIn 0.25s ease;
+        }
+
+        @keyframes riseIn {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Flash alert banners */
+        .flash-wrap {
+            margin-bottom: 20px;
+        }
+
+        .alert-custom {
+            background: rgba(15, 36, 64, 0.9);
+            border: 1px solid var(--line-strong);
+            color: var(--text-main);
+            border-radius: 10px;
+            padding: 12px 18px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .alert-custom.alert-success {
+            border-color: var(--teal);
+            background: rgba(45, 212, 191, 0.12);
+            color: #5eead4;
+        }
+
+        .alert-custom.alert-danger {
+            border-color: var(--rose);
+            background: rgba(244, 63, 94, 0.12);
+            color: #fda4af;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- ================= NAVBAR ================= -->
+    <nav class="navbar">
+        <div class="container-fluid px-4 py-2 d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center gap-3">
+                <a class="navbar-brand" href="{{ url_for('admin_dashboard') }}">
+                    <span class="brand-badge">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect>
+                            <line x1="8" y1="21" x2="16" y2="21"></line>
+                            <line x1="12" y1="17" x2="12" y2="21"></line>
+                        </svg>
+                    </span>
+                    IT Help Desk
+                </a>
+                <span class="admin-badge mono">Admin Control Center</span>
+            </div>
+
+            <!-- Add New Agent Button -->
+            <button type="button" class="btn-assign" style="padding: 7px 14px; font-size: 13px;" data-bs-toggle="modal"
+                data-bs-target="#agentsModal" onclick="openAddAgentTab()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add Agent
+            </button>
+
+            <!-- Manage Support Team -->
+            <button type="button" class="btn-ghost" data-bs-toggle="modal" data-bs-target="#agentsModal"
+                onclick="openTeamTab()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="9" cy="7" r="4"></circle>
+                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                </svg>
+                Support Agents
+            </button>
+
+            <!-- Switch to User View -->
+            <a href="{{ url_for('dashboard') }}" class="btn-ghost">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+                    <polyline points="10 17 15 12 10 7"></polyline>
+                    <line x1="15" y1="12" x2="3" y2="12"></line>
+                </svg>
+                User View
+            </a>
+
+            <!-- User pill -->
+            <div class="d-none d-md-flex align-items-center gap-2 px-2 py-1"
+                style="background: rgba(15,36,64,0.5); border-radius: 8px; border: 1px solid var(--line);">
+                <div class="avatar-initial" style="width:24px; height:24px; font-size:11px;">
+                    {{ username[:1] }}
+                </div>
+                <span class="mono" style="font-size:12.5px; color:var(--text-main);">{{ username }}</span>
+            </div>
+
+            <a href="{{ url_for('logout') }}" class="btn-logout">
+                Logout
+            </a>
+        </div>
+        </div>
+    </nav>
+
+    <!-- ================= MAIN ADMIN CONTENT ================= -->
+    <main class="admin-wrap">
+
+        <!-- Flash alerts -->
+        <div class="flash-wrap">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div class="alert-custom alert-{{ category if category != 'error' else 'danger' }} mb-2">
+                <span>{{ message }}</span>
+                <button type="button" class="btn-close-modal" onclick="this.parentElement.remove()">×</button>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+        </div>
+
+        <!-- Header -->
+        <section class="dash-header">
+            <div>
+                <div class="eyebrow mono">Administrator Operations</div>
+                <h1>Ticket Resolution Dashboard</h1>
+                <p>Manage, track, and assign IT help desk tickets across all Open, In-Progress, and Resolved states.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="button" class="btn-ghost" onclick="location.reload();">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                        stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Refresh
+                </button>
+            </div>
+        </section>
+
+        <!-- KPI Summary Cards -->
+        <section class="stats-grid">
+            <!-- All Tickets -->
+            <div class="stat-card card-total active-filter" onclick="filterByStatus('all', this)">
+                <div class="stat-top">
+                    <span class="stat-label mono">Total Issues</span>
+                    <span class="stat-icon icon-total">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </span>
+                </div>
+                <div class="stat-value mono" id="stat-total">{{ stats.total }}</div>
+                <p class="stat-desc">All submitted tickets</p>
+            </div>
+
+            <!-- Open Tickets -->
+            <div class="stat-card card-open" onclick="filterByStatus('Open', this)">
+                <div class="stat-top">
+                    <span class="stat-label mono">Open</span>
+                    <span class="stat-icon icon-open">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <polyline points="12 6 12 12 16 14"></polyline>
+                        </svg>
+                    </span>
+                </div>
+                <div class="stat-value mono" id="stat-open">{{ stats.open }}</div>
+                <p class="stat-desc">Awaiting resolution</p>
+            </div>
+
+            <!-- In Progress Tickets -->
+            <div class="stat-card card-progress" onclick="filterByStatus('In Progress', this)">
+                <div class="stat-top">
+                    <span class="stat-label mono">In Progress</span>
+                    <span class="stat-icon icon-progress">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2v4"></path>
+                            <path d="M12 18v4"></path>
+                            <path d="M4.93 4.93l2.83 2.83"></path>
+                            <path d="M16.24 16.24l2.83 2.83"></path>
+                            <path d="M2 12h4"></path>
+                            <path d="M18 12h4"></path>
+                        </svg>
+                    </span>
+                </div>
+                <div class="stat-value mono" id="stat-progress">{{ stats.in_progress }}</div>
+                <p class="stat-desc">Active investigation</p>
+            </div>
+
+            <!-- Resolved Tickets -->
+            <div class="stat-card card-resolved" onclick="filterByStatus('Resolved', this)">
+                <div class="stat-top">
+                    <span class="stat-label mono">Resolved</span>
+                    <span class="stat-icon icon-resolved">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </span>
+                </div>
+                <div class="stat-value mono" id="stat-resolved">{{ stats.resolved }}</div>
+                <p class="stat-desc">Fixed & completed</p>
+            </div>
+
+            <!-- Unassigned Tickets -->
+            <div class="stat-card card-unassigned" onclick="filterByUnassigned(this)">
+                <div class="stat-top">
+                    <span class="stat-label mono">Needs Agent</span>
+                    <span class="stat-icon icon-unassigned">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                            <circle cx="8.5" cy="7" r="4"></circle>
+                            <line x1="18" y1="8" x2="23" y2="13"></line>
+                            <line x1="23" y1="8" x2="18" y2="13"></line>
+                        </svg>
+                    </span>
+                </div>
+                <div class="stat-value mono" id="stat-unassigned">{{ stats.unassigned }}</div>
+                <p class="stat-desc">Requires agent assignment</p>
+            </div>
+        </section>
+
+        <!-- Filter & Search Toolbar -->
+        <section class="toolbar-panel">
+            <div class="toolbar-top">
+                <!-- Status Tab Pills -->
+                <div class="status-tabs" id="status-tab-group">
+                    <button class="tab-btn active" data-filter="all" onclick="filterByStatus('all', this)">
+                        All Tickets <span class="tab-badge">{{ stats.total }}</span>
+                    </button>
+                    <button class="tab-btn" data-filter="Open" onclick="filterByStatus('Open', this)">
+                        Open <span class="tab-badge">{{ stats.open }}</span>
+                    </button>
+                    <button class="tab-btn" data-filter="In Progress" onclick="filterByStatus('In Progress', this)">
+                        In Progress <span class="tab-badge">{{ stats.in_progress }}</span>
+                    </button>
+                    <button class="tab-btn" data-filter="Resolved" onclick="filterByStatus('Resolved', this)">
+                        Resolved <span class="tab-badge">{{ stats.resolved }}</span>
+                    </button>
+                    <button class="tab-btn" data-filter="unassigned" onclick="filterByUnassigned(this)">
+                        Unassigned <span class="tab-badge">{{ stats.unassigned }}</span>
+                    </button>
+                </div>
+
+                <!-- Search and dropdown filters -->
+                <div class="toolbar-controls">
+                    <!-- Search Input -->
+                    <div class="search-box">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                        <input type="text" id="ticket-search" placeholder="Search ticket #, title, user, agent..."
+                            onkeyup="applyFilters()">
+                    </div>
+
+                    <!-- Category Filter -->
+                    <select class="filter-select" id="category-filter" onchange="applyFilters()">
+                        <option value="all">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat.name }}">{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <!-- Assigned Agent Filter -->
+                    <select class="filter-select" id="agent-filter" onchange="applyFilters()">
+                        <option value="all">All Agents</option>
+                        <option value="__unassigned__">⚠️ Unassigned Only</option>
+                        {% for agent in agents %}
+                        <option value="{{ agent.username }}">{{ agent.username }} ({{ agent.role }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tickets Table -->
+        <section class="table-panel">
+            <div class="table-responsive">
+                <table class="tickets-table" id="tickets-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">Ticket ID</th>
+                            <th>Issue & Description</th>
+                            <th style="width: 140px;">Category</th>
+                            <th style="width: 200px;">Requester</th>
+                            <th style="width: 140px;">Status</th>
+                            <th style="width: 220px;">Assigned Agent</th>
+                            <th style="width: 130px;">Logged Date</th>
+                            <th style="width: 160px; text-align: right;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tickets-tbody">
+                        {% for ticket in tickets %}
+                        <tr class="ticket-row" id="row-{{ ticket.id }}" data-id="{{ ticket.id }}"
+                            data-status="{{ ticket.status }}" data-category="{{ ticket.category_name }}"
+                            data-assigned="{{ ticket.agent_name or '' }}"
+                            data-is-unassigned="{{ 'true' if not ticket.assigned_to else 'false' }}"
+                            data-search="{{ ticket.id }} {{ ticket.title|lower }} {{ ticket.description|lower }} {{ ticket.requester_name|lower }} {{ ticket.requester_email|lower }} {{ (ticket.agent_name or '')|lower }} {{ ticket.category_name|lower }}">
+
+                            <!-- Ticket ID -->
+                            <td>
+                                <span class="ticket-num mono">#TKT-{{ "%03d"|format(ticket.id) }}</span>
+                            </td>
+
+                            <!-- Issue Title & Description -->
+                            <td>
+                                <a href="javascript:void(0)" class="ticket-title-link"
+                                    onclick="openDetailsModal({{ ticket.id }})">
+                                    {{ ticket.title }}
+                                </a>
+                                <p class="ticket-desc-snippet" title="{{ ticket.description }}">
+                                    {{ ticket.description }}
+                                </p>
+                            </td>
+
+                            <!-- Category -->
+                            <td>
+                                <span class="cat-badge">{{ ticket.category_name }}</span>
+                            </td>
+
+                            <!-- Requester -->
+                            <td>
+                                <div class="user-info-box">
+                                    <div class="avatar-initial">
+                                        {{ ticket.requester_name[:1] }}
+                                    </div>
+                                    <div>
+                                        <div class="user-name">{{ ticket.requester_name }}</div>
+                                        <div class="user-email mono">{{ ticket.requester_email }}</div>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <!-- Current Status Pill -->
+                            <td>
+                                <div class="d-flex align-items-center gap-2">
+                                    {% if ticket.status == 'Open' %}
+                                    <span class="status-pill status-pill-open" id="badge-status-{{ ticket.id }}">
+                                        <span class="status-dot"></span> Open
+                                    </span>
+                                    {% elif ticket.status == 'In Progress' %}
+                                    <span class="status-pill status-pill-progress" id="badge-status-{{ ticket.id }}">
+                                        <span class="status-dot"></span> In Progress
+                                    </span>
+                                    {% elif ticket.status == 'Resolved' %}
+                                    <span class="status-pill status-pill-resolved" id="badge-status-{{ ticket.id }}">
+                                        <span class="status-dot"></span> Resolved
+                                    </span>
+                                    {% else %}
+                                    <span class="status-pill status-pill-closed" id="badge-status-{{ ticket.id }}">
+                                        <span class="status-dot"></span> Closed
+                                    </span>
+                                    {% endif %}
+                                </div>
+                            </td>
+
+                            <!-- Assigned Agent -->
+                            <td id="agent-cell-{{ ticket.id }}">
+                                {% if ticket.assigned_to %}
+                                <div class="agent-assigned-box">
+                                    <div class="agent-avatar">
+                                        {{ ticket.agent_name[:1] }}
+                                    </div>
+                                    <div>
+                                        <div class="agent-name">{{ ticket.agent_name }}</div>
+                                        <span class="role-tag {{ ticket.agent_role or 'staff' }}">{{ ticket.agent_role
+                                            or 'Staff' }}</span>
+                                    </div>
+                                </div>
+                                {% else %}
+                                <span class="unassigned-badge">
+                                    ⚠️ Unassigned
+                                </span>
+                                {% endif %}
+                            </td>
+
+                            <!-- Created Date -->
+                            <td>
+                                <span class="mono" style="font-size: 11.5px; color: var(--text-dim);">
+                                    {{ ticket.created_at.strftime('%b %d, %Y') if ticket.created_at else '' }}
+                                </span>
+                            </td>
+
+                            <!-- Actions -->
+                            <td style="text-align: right;">
+                                <div class="action-group justify-content-end">
+                                    <!-- Assign button -->
+                                    <button type="button" class="btn-assign"
+                                        onclick="openAssignModal({{ ticket.id }}, '{{ ticket.title|replace('\'', '\\\'') }}', '{{ ticket.category_name }}', '{{ ticket.requester_name }}', '{{ ticket.assigned_to or '' }}', '{{ ticket.status }}')">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2.2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="8.5" cy="7" r="4"></circle>
+                                            <polyline points="17 11 19 13 23 9"></polyline>
+                                        </svg>
+                                        {{ "Reassign" if ticket.assigned_to else "Assign" }}
+                                    </button>
+
+                                    <!-- Quick Details button -->
+                                    <button type="button" class="btn-details"
+                                        onclick="openDetailsModal({{ ticket.id }})" title="View Details & History">
+                                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none"
+                                            stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                                            stroke-linejoin="round">
+                                            <circle cx="12" cy="12" r="10"></circle>
+                                            <line x1="12" y1="16" x2="12" y2="12"></line>
+                                            <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                        </svg>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr class="empty-row">
+                            <td colspan="8">
+                                <p style="font-size: 16px; margin-bottom: 4px;">No tickets found in the system.</p>
+                                <span style="font-size: 13px;">New tickets submitted by users will appear here.</span>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODAL: ASSIGN AGENT ================= -->
+    <div class="modal fade" id="assignModal" tabindex="-1" aria-labelledby="assignModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="mono"
+                            style="font-size: 11px; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase;">
+                            Ticket Assignment
+                        </div>
+                        <h5 class="modal-title" id="assignModalLabel">Assign Agent for Ticket Resolution</h5>
+                    </div>
+                    <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">×</button>
+                </div>
+
+                <form id="assignAgentForm" onsubmit="submitAssignment(event)">
+                    <div class="modal-body">
+                        <!-- Preview Card -->
+                        <div class="ticket-modal-preview">
+                            <div class="preview-header">
+                                <span class="ticket-num mono" id="modal-ticket-id">#TKT-000</span>
+                                <span class="cat-badge" id="modal-ticket-category">Category</span>
+                            </div>
+                            <h6 class="preview-title" id="modal-ticket-title">Issue Title</h6>
+                            <p class="preview-desc" id="modal-ticket-requester"
+                                style="font-size: 12px; margin-top: 4px;">
+                                Requester: User
+                            </p>
+                        </div>
+
+                        <input type="hidden" id="form-ticket-id" name="ticket_id" value="">
+
+                        <!-- Agent Selection -->
+                        <div class="mb-3">
+                            <label class="form-label" for="form-agent-id">Select Support Agent</label>
+                            <select class="modal-select" id="form-agent-id" name="agent_id" required>
+                                <option value="">-- Choose Support Agent --</option>
+                                <option value="unassigned">⚠️ Unassign (Keep Open / Unassigned)</option>
+                                <optgroup label="Eligible IT Agents (Staff & Admin)">
+                                    {% for agent in agents %}
+                                    <option value="{{ agent.id }}" data-role="{{ agent.role }}">
+                                        {{ agent.username }} ({{ agent.role|capitalize }}) — {{ agent.active_tickets }}
+                                        active ticket{{ 's' if agent.active_tickets != 1 else '' }}
+                                    </option>
+                                    {% endfor %}
+                                </optgroup>
+                            </select>
+                            <div class="form-text" style="color: var(--text-dim); font-size: 11.5px; margin-top: 4px;">
+                                Active tickets indicate current open or in-progress workload.
+                            </div>
+                        </div>
+
+                        <!-- Status Action -->
+                        <div class="mb-3">
+                            <label class="form-label" for="form-ticket-status">Update Status</label>
+                            <select class="modal-select" id="form-ticket-status" name="status">
+                                <option value="In Progress">In Progress (Recommended on Assignment)</option>
+                                <option value="Open">Open</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Closed">Closed</option>
+                            </select>
+                        </div>
+
+                        <!-- Optional Note / Comment -->
+                        <div class="mb-2">
+                            <label class="form-label" for="form-ticket-note">Assignment / Resolution Note
+                                (Optional)</label>
+                            <textarea class="modal-textarea" id="form-ticket-note" name="note" rows="3"
+                                placeholder="Add guidance, internal technician instructions, or resolution notes..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn-ghost" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn-assign" style="padding: 9px 20px; font-size: 14px;"
+                            id="btn-save-assignment">
+                            Confirm Assignment
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: TICKET DETAILS & AUDIT LOG ================= -->
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="mono"
+                            style="font-size: 11px; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase;">
+                            Ticket Inspector & Audit Trail
+                        </div>
+                        <h5 class="modal-title" id="details-modal-title">Ticket Details</h5>
+                    </div>
+                    <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">×</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Ticket Meta Details -->
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-7">
+                            <div
+                                style="background: var(--navy-deep); border: 1px solid var(--line); border-radius: 10px; padding: 16px;">
+                                <div class="d-flex justify-content-between align-items-center mb-2">
+                                    <span class="ticket-num mono" id="details-ticket-id">#TKT-000</span>
+                                    <span class="cat-badge" id="details-ticket-category">Category</span>
+                                </div>
+                                <h5 id="details-title" style="font-weight: 700; margin-bottom: 10px;">Issue Title</h5>
+                                <div style="font-size: 13.5px; color: var(--text-dim); line-height: 1.6; white-space: pre-wrap;"
+                                    id="details-description">
+                                    Ticket Description
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-5">
+                            <div
+                                style="background: var(--navy-deep); border: 1px solid var(--line); border-radius: 10px; padding: 16px; height: 100%;">
+                                <div class="mb-3">
+                                    <div class="form-label" style="font-size: 11px;">Current Status</div>
+                                    <div id="details-status-badge">
+                                        <span class="status-pill status-pill-open">Open</span>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-label" style="font-size: 11px;">Submitted By</div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-initial" id="details-requester-avatar"
+                                            style="width: 26px; height: 26px; font-size: 11px;">U</div>
+                                        <div>
+                                            <div style="font-weight: 600; font-size: 13px;" id="details-requester-name">
+                                                Requester Name</div>
+                                            <div class="mono" style="font-size: 11px; color: var(--text-dim);"
+                                                id="details-requester-email">user@email.com</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-3">
+                                    <div class="form-label" style="font-size: 11px;">Assigned Agent</div>
+                                    <div id="details-agent-box" style="font-size: 13px;">
+                                        ⚠️ Unassigned
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <div class="form-label" style="font-size: 11px;">Date Submitted</div>
+                                    <div class="mono" style="font-size: 12px; color: var(--text-dim);"
+                                        id="details-date">
+                                        Date
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- History Timeline & Comments Tabs -->
+                    <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="tab-btn active" id="pills-history-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-history" type="button" role="tab">
+                                Status Audit Trail
+                            </button>
+                        </li>
+                        <li class="nav-item ms-2" role="presentation">
+                            <button class="tab-btn" id="pills-comments-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-comments" type="button" role="tab">
+                                Comments & Notes
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="pills-tabContent">
+                        <!-- History Tab -->
+                        <div class="tab-pane fade show active" id="pills-history" role="tabpanel">
+                            <div style="background: var(--navy-deep); border: 1px solid var(--line); border-radius: 10px; padding: 18px;"
+                                id="history-container">
+                                <ul class="timeline-list" id="timeline-list">
+                                    <!-- Dynamic items -->
+                                </ul>
+                            </div>
+                        </div>
+
+                        <!-- Comments Tab -->
+                        <div class="tab-pane fade" id="pills-comments" role="tabpanel">
+                            <div style="background: var(--navy-deep); border: 1px solid var(--line); border-radius: 10px; padding: 18px;"
+                                id="comments-container">
+                                <div id="comments-list">
+                                    <!-- Dynamic items -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn-ghost" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn-assign" id="btn-assign-from-details"
+                        onclick="transferToAssignModal()">
+                        Assign / Reassign Agent
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= MODAL: SUPPORT AGENTS & ROLES ================= -->
+    <div class="modal fade" id="agentsModal" tabindex="-1" aria-labelledby="agentsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <div class="mono"
+                            style="font-size: 11px; color: var(--teal); letter-spacing: 0.08em; text-transform: uppercase;">
+                            Team Management
+                        </div>
+                        <h5 class="modal-title" id="agentsModalLabel">Support Agents & User Roles</h5>
+                    </div>
+                    <button type="button" class="btn-close-modal" data-bs-dismiss="modal" aria-label="Close">×</button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Modal Navigation Tabs -->
+                    <ul class="nav nav-pills mb-4" id="agents-pills-tab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="tab-btn active" id="pills-add-agent-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-add-agent" type="button" role="tab">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                                </svg>
+                                + Create New Agent
+                            </button>
+                        </li>
+                        <li class="nav-item ms-2" role="presentation">
+                            <button class="tab-btn" id="pills-team-tab" data-bs-toggle="pill"
+                                data-bs-target="#pills-team" type="button" role="tab">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                                    <circle cx="9" cy="7" r="4"></circle>
+                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                                </svg>
+                                All Users & Role Manager
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="agents-pills-tabContent">
+                        <!-- Tab 1: Create New Agent Form -->
+                        <div class="tab-pane fade show active" id="pills-add-agent" role="tabpanel">
+                            <form id="addAgentForm" onsubmit="submitAddAgent(event)">
+                                <div
+                                    style="background: var(--navy-deep); border: 1px solid var(--line); border-radius: 12px; padding: 20px;">
+                                    <h6 style="font-weight: 700; color: var(--teal); margin-bottom: 4px;">
+                                        Register a New IT Support Agent
+                                    </h6>
+                                    <p style="font-size: 12.5px; color: var(--text-dim); margin-bottom: 18px;">
+                                        Creating an agent account allows them to be assigned to tickets and assist in
+                                        problem resolution.
+                                    </p>
+
+                                    <div class="row g-3 mb-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="agent-username">Agent Full Name /
+                                                Username</label>
+                                            <input type="text" class="modal-input" id="agent-username" name="username"
+                                                placeholder="e.g. David Miller" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="agent-email">Email Address</label>
+                                            <input type="email" class="modal-input" id="agent-email" name="email"
+                                                placeholder="e.g. david@ithelpdesk.com" required>
+                                        </div>
+                                    </div>
+
+                                    <div class="row g-3 mb-4">
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="agent-password">Initial Password</label>
+                                            <input type="password" class="modal-input" id="agent-password"
+                                                name="password" placeholder="Temporary password" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label" for="agent-role">Role Permission</label>
+                                            <select class="modal-select" id="agent-role" name="role">
+                                                <option value="staff" selected>Staff (Support Technician / Agent)
+                                                </option>
+                                                <option value="admin">Administrator (Full Dashboard Access)</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end">
+                                        <button type="submit" class="btn-assign" id="btn-create-agent"
+                                            style="padding: 10px 22px; font-size: 13.5px;">
+                                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none"
+                                                stroke="currentColor" stroke-width="2.5" stroke-linecap="round"
+                                                stroke-linejoin="round">
+                                                <line x1="12" y1="5" x2="12" y2="19"></line>
+                                                <line x1="5" y1="12" x2="19" y2="12"></line>
+                                            </svg>
+                                            Create & Activate Agent
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Tab 2: Existing Team & Role Manager -->
+                        <div class="tab-pane fade" id="pills-team" role="tabpanel">
+                            <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 14px;">
+                                Users with role <strong>staff</strong> or <strong>admin</strong> are designated support
+                                agents and appear in the assignment dropdown. You can promote any existing student to
+                                staff below:
+                            </p>
+
+                            <div class="table-responsive" style="max-height: 360px; overflow-y: auto;">
+                                <table class="tickets-table">
+                                    <thead>
+                                        <tr>
+                                            <th>User</th>
+                                            <th>Email</th>
+                                            <th>Current Role</th>
+                                            <th style="text-align: right;">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="users-role-tbody">
+                                        {% for u in all_users %}
+                                        <tr>
+                                            <td>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <div class="avatar-initial"
+                                                        style="width: 26px; height: 26px; font-size: 11px;">
+                                                        {{ u.username[:1] }}
+                                                    </div>
+                                                    <span style="font-weight: 600;">{{ u.username }}</span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="mono" style="font-size: 12px; color: var(--text-dim);">{{
+                                                    u.email }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="role-tag {{ u.role }}" id="user-role-badge-{{ u.id }}">
+                                                    {{ u.role|capitalize }}
+                                                </span>
+                                            </td>
+                                            <td style="text-align: right;">
+                                                <select class="status-quick-select"
+                                                    onchange="changeUserRole({{ u.id }}, this.value)">
+                                                    <option value="student" {{ 'selected' if u.role=='student' else ''
+                                                        }}>Student</option>
+                                                    <option value="staff" {{ 'selected' if u.role=='staff' else '' }}>
+                                                        Staff (Agent)</option>
+                                                    <option value="admin" {{ 'selected' if u.role=='admin' else '' }}>
+                                                        Admin</option>
+                                                </select>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn-ghost" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= TOAST CONTAINER ================= -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // State variables
+        let currentStatusFilter = 'all';
+        let currentActiveTicket = null;
+
+        // Toast notifications
+        function showToast(message, isSuccess = true) {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast';
+            toast.style.borderColor = isSuccess ? 'var(--teal)' : 'var(--rose)';
+            toast.innerHTML = `
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="${isSuccess ? 'var(--teal)' : 'var(--rose)'}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    ${isSuccess ? '<polyline points="20 6 9 17 4 12"></polyline>' : '<circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line>'}
+                </svg>
+                <span>${message}</span>
+            `;
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transition = 'opacity 0.3s ease';
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Filter by Status Tab
+        function filterByStatus(status, element) {
+            currentStatusFilter = status;
+
+            // Highlight Tab
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const matchedTab = document.querySelector(`.tab-btn[data-filter="${status}"]`);
+            if (matchedTab) matchedTab.classList.add('active');
+
+            // Highlight Stat Card
+            document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-filter'));
+            if (element && element.classList.contains('stat-card')) {
+                element.classList.add('active-filter');
+            } else {
+                const cardMap = { 'all': '.card-total', 'Open': '.card-open', 'In Progress': '.card-progress', 'Resolved': '.card-resolved' };
+                if (cardMap[status]) {
+                    const card = document.querySelector(cardMap[status]);
+                    if (card) card.classList.add('active-filter');
+                }
+            }
+
+            applyFilters();
+        }
+
+        // Filter by Unassigned
+        function filterByUnassigned(element) {
+            currentStatusFilter = 'unassigned';
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            const matchedTab = document.querySelector('.tab-btn[data-filter="unassigned"]');
+            if (matchedTab) matchedTab.classList.add('active');
+
+            document.querySelectorAll('.stat-card').forEach(c => c.classList.remove('active-filter'));
+            const unassignedCard = document.querySelector('.card-unassigned');
+            if (unassignedCard) unassignedCard.classList.add('active-filter');
+
+            applyFilters();
+        }
+
+        // Apply all search and dropdown filters
+        function applyFilters() {
+            const searchQuery = document.getElementById('ticket-search').value.toLowerCase().trim();
+            const categoryVal = document.getElementById('category-filter').value;
+            const agentVal = document.getElementById('agent-filter').value;
+            const rows = document.querySelectorAll('.ticket-row');
+
+            let visibleCount = 0;
+
+            rows.forEach(row => {
+                const status = row.getAttribute('data-status');
+                const category = row.getAttribute('data-category');
+                const assigned = row.getAttribute('data-assigned');
+                const isUnassigned = row.getAttribute('data-is-unassigned') === 'true';
+                const searchData = row.getAttribute('data-search');
+
+                let matchStatus = true;
+                if (currentStatusFilter === 'unassigned') {
+                    matchStatus = isUnassigned;
+                } else if (currentStatusFilter !== 'all') {
+                    matchStatus = (status === currentStatusFilter);
+                }
+
+                let matchCategory = (categoryVal === 'all' || category === categoryVal);
+
+                let matchAgent = true;
+                if (agentVal === '__unassigned__') {
+                    matchAgent = isUnassigned;
+                } else if (agentVal !== 'all') {
+                    matchAgent = (assigned === agentVal);
+                }
+
+                let matchSearch = (!searchQuery || searchData.includes(searchQuery));
+
+                if (matchStatus && matchCategory && matchAgent && matchSearch) {
+                    row.style.display = '';
+                    visibleCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            // Handle empty search result message
+            let emptyMsg = document.getElementById('no-match-row');
+            if (visibleCount === 0) {
+                if (!emptyMsg) {
+                    const tbody = document.getElementById('tickets-tbody');
+                    emptyMsg = document.createElement('tr');
+                    emptyMsg.id = 'no-match-row';
+                    emptyMsg.className = 'empty-row';
+                    emptyMsg.innerHTML = '<td colspan="8"><p style="font-size:15px; margin:0;">No tickets match your filter criteria.</p></td>';
+                    tbody.appendChild(emptyMsg);
+                }
+            } else if (emptyMsg) {
+                emptyMsg.remove();
+            }
+        }
+
+        // Open Assign Modal
+        function openAssignModal(ticketId, title, category, requester, assignedTo, status) {
+            document.getElementById('form-ticket-id').value = ticketId;
+            document.getElementById('modal-ticket-id').textContent = `#TKT-${String(ticketId).padStart(3, '0')}`;
+            document.getElementById('modal-ticket-title').textContent = title;
+            document.getElementById('modal-ticket-category').textContent = category;
+            document.getElementById('modal-ticket-requester').textContent = `Requester: ${requester}`;
+
+            // Set current agent if any
+            const agentSelect = document.getElementById('form-agent-id');
+            agentSelect.value = assignedTo || '';
+
+            // Set recommended next status
+            const statusSelect = document.getElementById('form-ticket-status');
+            if (status === 'Open') {
+                statusSelect.value = 'In Progress';
+            } else {
+                statusSelect.value = status;
+            }
+
+            document.getElementById('form-ticket-note').value = '';
+
+            const modal = new bootstrap.Modal(document.getElementById('assignModal'));
+            modal.show();
+        }
+
+        // Submit Assignment Form via AJAX
+        async function submitAssignment(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-save-assignment');
+            btn.disabled = true;
+            btn.textContent = 'Saving...';
+
+            const ticketId = document.getElementById('form-ticket-id').value;
+            const agentId = document.getElementById('form-agent-id').value;
+            const status = document.getElementById('form-ticket-status').value;
+            const note = document.getElementById('form-ticket-note').value;
+
+            try {
+                const response = await fetch("{{ url_for('assign_agent') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        ticket_id: ticketId,
+                        agent_id: agentId,
+                        status: status,
+                        note: note
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast(data.message, true);
+
+                    // Update table row in place
+                    const row = document.getElementById(`row-${ticketId}`);
+                    if (row) {
+                        row.setAttribute('data-status', data.status);
+                        row.setAttribute('data-assigned', data.agent_name !== 'Unassigned' ? data.agent_name : '');
+                        row.setAttribute('data-is-unassigned', data.agent_id ? 'false' : 'true');
+
+                        // Update Status Badge
+                        const statusCell = document.getElementById(`badge-status-{{ ticket_id }}`.replace('{{ ticket_id }}', ticketId));
+                        if (statusCell) {
+                            statusCell.className = `status-pill status-pill-${data.status.toLowerCase().replace(' ', '')}`;
+                            statusCell.innerHTML = `<span class="status-dot"></span> ${data.status}`;
+                        }
+
+                        // Update Agent Cell
+                        const agentCell = document.getElementById(`agent-cell-${ticketId}`);
+                        if (agentCell) {
+                            if (data.agent_id) {
+                                agentCell.innerHTML = `
+                                    <div class="agent-assigned-box">
+                                        <div class="agent-avatar">${data.agent_name.charAt(0)}</div>
+                                        <div>
+                                            <div class="agent-name">${data.agent_name}</div>
+                                            <span class="role-tag staff">Assigned</span>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                agentCell.innerHTML = `<span class="unassigned-badge">⚠️ Unassigned</span>`;
+                            }
+                        }
+                    }
+
+                    // Hide modal
+                    bootstrap.Modal.getInstance(document.getElementById('assignModal')).hide();
+
+                    // Slightly delay reload to refresh overall KPI counts
+                    setTimeout(() => location.reload(), 900);
+                } else {
+                    showToast(data.message || 'Assignment failed', false);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to assign agent. Please try again.', false);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Confirm Assignment';
+            }
+        }
+
+        // Open Details & History Modal
+        async function openDetailsModal(ticketId) {
+            try {
+                const response = await fetch(`/admin/ticket-details/${ticketId}`);
+                const data = await response.json();
+                if (!data.success) {
+                    showToast('Could not load ticket details', false);
+                    return;
+                }
+
+                currentActiveTicket = data.ticket;
+
+                // Populate Meta
+                document.getElementById('details-ticket-id').textContent = `#TKT-${String(data.ticket.id).padStart(3, '0')}`;
+                document.getElementById('details-ticket-category').textContent = data.ticket.category_name;
+                document.getElementById('details-title').textContent = data.ticket.title;
+                document.getElementById('details-description').textContent = data.ticket.description;
+                document.getElementById('details-date').textContent = data.ticket.created_at_fmt;
+
+                // Requester
+                document.getElementById('details-requester-name').textContent = data.ticket.requester_name;
+                document.getElementById('details-requester-email').textContent = data.ticket.requester_email;
+                document.getElementById('details-requester-avatar').textContent = data.ticket.requester_name.charAt(0);
+
+                // Status
+                const statusBadge = document.getElementById('details-status-badge');
+                statusBadge.innerHTML = `
+                    <span class="status-pill status-pill-${data.ticket.status.toLowerCase().replace(' ', '')}">
+                        <span class="status-dot"></span> ${data.ticket.status}
+                    </span>
+                `;
+
+                // Agent
+                const agentBox = document.getElementById('details-agent-box');
+                if (data.ticket.agent_name) {
+                    agentBox.innerHTML = `
+                        <div class="agent-assigned-box">
+                            <div class="agent-avatar">${data.ticket.agent_name.charAt(0)}</div>
+                            <div>
+                                <div class="agent-name">${data.ticket.agent_name}</div>
+                                <div class="mono" style="font-size:11px; color:var(--text-dim);">${data.ticket.agent_email}</div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    agentBox.innerHTML = `<span class="unassigned-badge">⚠️ Unassigned</span>`;
+                }
+
+                // History Timeline
+                const timelineList = document.getElementById('timeline-list');
+                timelineList.innerHTML = '';
+                if (data.history && data.history.length > 0) {
+                    data.history.forEach(h => {
+                        const li = document.createElement('li');
+                        li.className = 'timeline-item';
+                        li.innerHTML = `
+                            <span class="timeline-dot"></span>
+                            <div class="timeline-title">Status changed: ${h.old_status || 'Created'} → ${h.new_status}</div>
+                            <div class="timeline-time mono">by ${h.changed_by} • ${h.changed_at_fmt}</div>
+                        `;
+                        timelineList.appendChild(li);
+                    });
+                } else {
+                    timelineList.innerHTML = '<li style="color:var(--text-dim); font-size:13px;">No status changes recorded yet.</li>';
+                }
+
+                // Comments
+                const commentsList = document.getElementById('comments-list');
+                commentsList.innerHTML = '';
+                if (data.comments && data.comments.length > 0) {
+                    data.comments.forEach(c => {
+                        const div = document.createElement('div');
+                        div.style.padding = '10px 14px';
+                        div.style.marginBottom = '10px';
+                        div.style.borderRadius = '8px';
+                        div.style.background = 'rgba(7,20,39,0.7)';
+                        div.style.border = '1px solid var(--line)';
+                        div.innerHTML = `
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span style="font-weight:600; font-size:12.5px; color:var(--teal);">${c.username} (${c.role})</span>
+                                <span class="mono" style="font-size:11px; color:var(--text-dim);">${c.created_at_fmt}</span>
+                            </div>
+                            <div style="font-size:13px; color:var(--text-main);">${c.comment}</div>
+                        `;
+                        commentsList.appendChild(div);
+                    });
+                } else {
+                    commentsList.innerHTML = '<p style="color:var(--text-dim); font-size:13px; margin:0;">No internal comments or notes logged for this ticket.</p>';
+                }
+
+                const modal = new bootstrap.Modal(document.getElementById('detailsModal'));
+                modal.show();
+
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to fetch ticket details', false);
+            }
+        }
+
+        // Jump from details modal directly to assign modal
+        function transferToAssignModal() {
+            if (!currentActiveTicket) return;
+            bootstrap.Modal.getInstance(document.getElementById('detailsModal')).hide();
+            setTimeout(() => {
+                openAssignModal(
+                    currentActiveTicket.id,
+                    currentActiveTicket.title,
+                    currentActiveTicket.category_name,
+                    currentActiveTicket.requester_name,
+                    currentActiveTicket.assigned_to,
+                    currentActiveTicket.status
+                );
+            }, 300);
+        }
+
+        // Quick Role Update
+        async function changeUserRole(userId, newRole) {
+            try {
+                const response = await fetch("{{ url_for('update_user_role') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({ user_id: userId, role: newRole })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast(data.message, true);
+                    const badge = document.getElementById(`user-role-badge-${userId}`);
+                    if (badge) {
+                        badge.className = `role-tag ${newRole}`;
+                        badge.textContent = newRole.charAt(0).toUpperCase() + newRole.slice(1);
+                    }
+                    setTimeout(() => location.reload(), 900);
+                } else {
+                    showToast(data.message, false);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Failed to update role', false);
+            }
+        }
+
+        // Open specific tabs in Support Agents modal
+        function openAddAgentTab() {
+            const addTabBtn = document.getElementById('pills-add-agent-tab');
+            if (addTabBtn) {
+                const tab = new bootstrap.Tab(addTabBtn);
+                tab.show();
+            }
+        }
+
+        function openTeamTab() {
+            const teamTabBtn = document.getElementById('pills-team-tab');
+            if (teamTabBtn) {
+                const tab = new bootstrap.Tab(teamTabBtn);
+                tab.show();
+            }
+        }
+
+        // Submit New Agent Registration via AJAX
+        async function submitAddAgent(e) {
+            e.preventDefault();
+            const btn = document.getElementById('btn-create-agent');
+            btn.disabled = true;
+            btn.innerHTML = 'Creating Agent...';
+
+            const username = document.getElementById('agent-username').value.trim();
+            const email = document.getElementById('agent-email').value.trim();
+            const password = document.getElementById('agent-password').value.trim();
+            const role = document.getElementById('agent-role').value;
+
+            try {
+                const response = await fetch("{{ url_for('add_agent') }}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: JSON.stringify({
+                        username: username,
+                        email: email,
+                        password: password,
+                        role: role
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    showToast(data.message, true);
+                    document.getElementById('addAgentForm').reset();
+                    bootstrap.Modal.getInstance(document.getElementById('agentsModal')).hide();
+                    setTimeout(() => location.reload(), 900);
+                } else {
+                    showToast(data.message || 'Failed to create agent', false);
+                }
+            } catch (err) {
+                console.error(err);
+                showToast('Error connecting to server. Please try again.', false);
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = `
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Create & Activate Agent
+                `;
+            }
+        }
+    </script>
+</body>
+
+</html>

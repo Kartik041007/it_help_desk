@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify OTP & Passkey | IT Help Desk</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy-deep: #071427;
+            --panel: #0f2440;
+            --line: rgba(120, 190, 255, 0.14);
+            --teal: #2dd4bf;
+            --amber: #ffb454;
+            --text-dim: #93a4c3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--navy-deep);
+            font-family: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #eef3fb;
+            position: relative;
+            overflow-x: hidden;
+            padding: 20px;
+        }
+
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                linear-gradient(var(--line) 1px, transparent 1px),
+                linear-gradient(90deg, var(--line) 1px, transparent 1px);
+            background-size: 46px 46px;
+            mask-image: radial-gradient(circle at 50% 0%, black 0%, transparent 75%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: -15%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 1000px;
+            height: 700px;
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.14) 0%, rgba(255, 180, 84, 0.05) 40%, transparent 70%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .auth-card {
+            width: 100%;
+            max-width: 480px;
+            padding: 40px 36px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 16px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--teal), #0d9488);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(45, 212, 191, 0.35);
+            color: #04231f;
+        }
+
+        .eyebrow {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            font-size: 11.5px;
+            letter-spacing: 0.1em;
+            color: var(--teal);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            font-weight: 600;
+        }
+
+        .form-heading {
+            text-align: center;
+            margin: 0 0 6px 0;
+            font-size: 24px;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .form-subtitle {
+            text-align: center;
+            font-size: 13.5px;
+            color: var(--text-dim);
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        .email-highlight {
+            color: var(--teal);
+            font-weight: 600;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .form-control {
+            width: 100%;
+            height: 52px;
+            border: 1.5px solid var(--line);
+            border-radius: 10px;
+            padding: 10px 16px;
+            background: rgba(255, 255, 255, 0.03);
+            color: #ffffff;
+            font-size: 18px;
+            letter-spacing: 0.08em;
+            text-align: center;
+            outline: none;
+            transition: all 0.2s ease;
+        }
+
+        .form-control:focus {
+            border-color: var(--teal);
+            background: rgba(45, 212, 191, 0.05);
+            box-shadow: 0 0 0 4px rgba(45, 212, 191, 0.15);
+        }
+
+        .btn {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 9px;
+            background: linear-gradient(135deg, var(--teal), #0d9488);
+            color: #04231f;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 10px 24px rgba(45, 212, 191, 0.25);
+            transition: all 0.2s ease;
+            margin-top: 6px;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 14px 28px rgba(45, 212, 191, 0.35);
+        }
+
+        .resend-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            font-size: 13px;
+            color: var(--text-dim);
+        }
+
+        .btn-link-action {
+            background: none;
+            border: none;
+            color: var(--amber);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+            text-decoration: underline;
+        }
+
+        .btn-link-action:hover {
+            color: #ffffff;
+        }
+
+        .alert-box {
+            padding: 11px 16px;
+            border-radius: 9px;
+            font-size: 13px;
+            margin-bottom: 18px;
+            line-height: 1.45;
+        }
+
+        .alert-danger {
+            background: rgba(244, 63, 94, 0.15);
+            border: 1px solid rgba(244, 63, 94, 0.35);
+            color: #fda4af;
+        }
+
+        .alert-info, .alert-success {
+            background: rgba(45, 212, 191, 0.15);
+            border: 1px solid rgba(45, 212, 191, 0.35);
+            color: #5eead4;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-card">
+    <!-- Icon -->
+    <div class="badge-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+        </svg>
+    </div>
+
+    <div class="eyebrow mono">Security Verification</div>
+    <h2 class="form-heading">Enter OTP or Passkey</h2>
+    <p class="form-subtitle">
+        We've sent a 6-digit verification code and passkey to <span class="email-highlight mono">{{ email }}</span>. Please check your inbox or spam folder.
+    </p>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="alert-box alert-{{ category if category != 'error' else 'danger' }}">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form action="{{ url_for('verify_otp', email=email) }}" method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+            <label for="otp">Enter 6-Digit OTP or Passkey</label>
+            {{ form.otp(
+                class_='form-control mono' + (' is-invalid' if form.otp.errors else ''),
+                id='otp',
+                placeholder='e.g. 123456 or Passkey',
+                autocomplete='one-time-code',
+                required=True
+            ) }}
+            {% for error in form.otp.errors %}
+              <div style="color: #f87171; font-size: 12px; margin-top: 5px; font-weight: 500;">⚠️ {{ error }}</div>
+            {% endfor %}
+        </div>
+
+        {{ form.submit(class_='btn') }}
+    </form>
+
+    <div class="resend-section">
+        <form action="{{ url_for('resend_otp') }}" method="POST" style="margin: 0;">
+            <input type="hidden" name="email" value="{{ email }}">
+            Didn't receive code?
+            <button type="submit" class="btn-link-action ms-1">Resend Code</button>
+        </form>
+
+        <a href="{{ url_for('login') }}" style="color: var(--text-dim); text-decoration: none;">
+            ← Back to Login
+        </a>
+    </div>
+</div>
+
+</body>
+</html>

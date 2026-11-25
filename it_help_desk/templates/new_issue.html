@@ -1,0 +1,320 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Raise New Issue | IT Help Desk</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --navy-deep: #071427;
+            --navy: #0d1f38;
+            --panel: #0f2440;
+            --line: rgba(120, 190, 255, 0.14);
+            --teal: #2dd4bf;
+            --amber: #ffb454;
+            --text: #e8f0ff;
+            --text-dim: #93a4c3;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Space Grotesk", sans-serif;
+            color: var(--text);
+            background:
+                linear-gradient(rgba(7, 20, 39, 0.96), rgba(7, 20, 39, 0.98)),
+                repeating-linear-gradient(
+                    90deg,
+                    transparent 0,
+                    transparent 60px,
+                    rgba(120, 190, 255, 0.04) 61px
+                ),
+                repeating-linear-gradient(
+                    0deg,
+                    transparent 0,
+                    transparent 60px,
+                    rgba(120, 190, 255, 0.04) 61px
+                );
+        }
+
+        /* Navbar */
+        .navbar {
+            height: 72px;
+            padding: 0 50px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--line);
+            background: rgba(7, 20, 39, 0.85);
+        }
+
+        .brand {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--teal);
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .nav-right a {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .nav-right a:hover {
+            color: var(--teal);
+        }
+
+        /* Main */
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 60px auto;
+        }
+
+        .heading {
+            margin-bottom: 30px;
+        }
+
+        .heading h1 {
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .heading p {
+            color: var(--text-dim);
+            margin: 0;
+        }
+
+        /* Form Card */
+        .form-card {
+            background: rgba(15, 36, 64, 0.9);
+            border: 1px solid var(--line);
+            border-radius: 16px;
+            padding: 35px;
+            box-shadow: 0 0 40px rgba(45, 212, 191, 0.05);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 9px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #cbd8ef;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 14px 15px;
+            border-radius: 9px;
+            border: 1px solid var(--line);
+            background: var(--navy-deep);
+            color: var(--text);
+            font-family: "Space Grotesk", sans-serif;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--teal);
+            box-shadow: 0 0 0 2px rgba(45, 212, 191, 0.08);
+        }
+
+        textarea {
+            min-height: 180px;
+            resize: vertical;
+        }
+
+        select option {
+            background: var(--navy-deep);
+            color: var(--text);
+        }
+
+        /* Buttons */
+        .actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+
+        .back-btn {
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-btn:hover {
+            color: var(--teal);
+        }
+
+        .btn {
+            border: none;
+            border-radius: 9px;
+            padding: 13px 25px;
+            background: var(--teal);
+            color: #06141f;
+            font-family: "Space Grotesk", sans-serif;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background: #5eead4;
+        }
+
+        /* Flash messages */
+        .flash {
+            margin-bottom: 20px;
+            padding: 12px 15px;
+            border-radius: 8px;
+            background: rgba(45, 212, 191, 0.1);
+            border: 1px solid rgba(45, 212, 191, 0.25);
+            color: var(--teal);
+        }
+
+        .error {
+            color: #ff8b8b;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 600px) {
+            .navbar {
+                padding: 0 20px;
+            }
+
+            .container {
+                width: 92%;
+                margin: 35px auto;
+            }
+
+            .form-card {
+                padding: 22px;
+            }
+
+            .heading h1 {
+                font-size: 28px;
+            }
+
+            .actions {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="brand">IT Help Desk</div>
+
+        <div class="nav-right">
+            <a href="{{ url_for('dashboard') }}">Dashboard</a>
+            <a href="{{ url_for('logout') }}">Logout</a>
+        </div>
+    </nav>
+
+    <!-- Main -->
+    <div class="container">
+
+        <div class="heading">
+            <h1>Raise a New Issue</h1>
+            <p>Tell us about your IT problem and our support team will handle it.</p>
+        </div>
+
+        {% with messages = get_flashed_messages() %}
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="flash">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="form-card">
+
+            <form method="POST">
+
+                {{ form.hidden_tag() }}
+
+                <div class="form-group">
+                    {{ form.title.label }}
+
+                    {{ form.title(
+                        placeholder="e.g. Wi-Fi not connecting on my laptop"
+                    ) }}
+
+                    {% for error in form.title.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="form-group">
+                    {{ form.category.label }}
+
+                    {{ form.category() }}
+
+                    {% for error in form.category.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="form-group">
+                    {{ form.description.label }}
+
+                    {{ form.description(
+                        placeholder="Describe your issue in detail..."
+                    ) }}
+
+                    {% for error in form.description.errors %}
+                        <div class="error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+
+                <div class="actions">
+
+                    <a href="{{ url_for('dashboard') }}" class="back-btn">
+                        ← Back to Dashboard
+                    </a>
+
+                    {{ form.submit(class_="btn") }}
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
